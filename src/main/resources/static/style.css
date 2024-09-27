@@ -1,0 +1,57 @@
+body {
+    color: #333; /* Более мягкий цвет текста для лучшей читаемости */
+    font-family: 'Arial', sans-serif; /* Современный шрифт */
+    background-color: #f4f4f4; /* Светлый фон для контраста */
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: #007BFF; /* Яркий синий цвет для навигационной панели */
+    color: #ffffff;
+}
+
+.navbar a.nav-link {
+    color: #ffffff; /* Белый текст на темном фоне для навигационных ссылок */
+}
+
+.navbar a.nav-link:hover,
+.navbar a.nav-link:focus {
+    color: #cce5ff; /* Светлее при наведении для лучшей интерактивности */
+    text-decoration: none; /* Убрать подчеркивание при наведении */
+}
+
+.form-control {
+    border-radius: 0.25rem; /* Скругление углов */
+    border: 1px solid #ced4da;
+}
+
+.btn-primary {
+    background-color: #0069D9; /* Темно-синий для кнопок */
+    border: none;
+}
+
+.btn-outline-primary {
+    color: #007BFF;
+    border-color: #007BFF;
+}
+
+.list-group-item {
+    background-color: #ffffff; /* Белый фон для элементов списка */
+    border: 1px solid #ddd; /* Слабый граница для разделения */
+}
+
+.alert {
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.25rem;
+}
+
+.custom-file-label {
+    background-color: #eeeeee; /* Светлый фон для метки файла */
+    border: 1px solid #ced4da;
+}
+
+textarea.form-control {
+    height: auto; /* Автоматическая высота для текстового поля */
+}
+
