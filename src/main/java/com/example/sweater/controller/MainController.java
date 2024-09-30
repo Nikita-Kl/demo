@@ -231,7 +231,7 @@ public class MainController {
             @AuthenticationPrincipal User currentUser,
             @PathVariable User user,
             Model model,
-            @RequestParam(required = false) Message message             // Внедряем зависимость репозитория отзывов
+            @RequestParam(required = false) Message message             
     ) {
         Set<Message> messages = user.getMessages();
         List<Review> reviews = Collections.emptyList();
@@ -355,25 +355,25 @@ public class MainController {
             @RequestParam("cost") String costStr,
             RedirectAttributes redirectAttributes
     ) {
-        // Проверяем, что сообщение и стоимость не пустые
+        
         if (message != null) {
-            // Создаем новую запись UserSale
+            
             UserSale userSale = new UserSale();
             userSale.setUser(currentUser);
             userSale.setMessage(message);
             Long cost = Long.parseLong(costStr.replaceAll("[^\\d]", ""));
             userSale.setCost(cost);
 
-            // Сохраняем новую запись в базе данных
+            
             userSaleRepo.save(userSale);
             return "redirect:/user-sale/" + userSale.getId() + "/check";
-            // Добавляем флеш-сообщение об успешном сохранении
+            
         } else {
-            // Добавляем флеш-сообщение об ошибке
+            
             redirectAttributes.addFlashAttribute("saleError", "Сообщение и стоимость не могут быть пустыми!");
         }
 
-        // Перенаправляем пользователя на страницу с продажами
+        
         return "redirect:/user-sale/" + userId + "?message=" + message.getId();
     }
     @GetMapping("/user-sale/{saleId}/check")
