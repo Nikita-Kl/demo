@@ -4,6 +4,9 @@ import com.example.sweater.domain.Message;
 import com.example.sweater.domain.Review;
 import com.example.sweater.domain.User;
 import com.example.sweater.domain.UserSale;
+import com.example.sweater.domain.dto.MessageDto;
+import com.example.sweater.domain.dto.ReviewDto;
+import com.example.sweater.domain.dto.UserSaleDto;
 import com.example.sweater.repos.MessageRepo;
 import com.example.sweater.repos.ReviewRepo;
 import com.example.sweater.repos.SaleRepo;
@@ -39,6 +42,49 @@ public class MainService {
 
     @Value("${upload.path}")
     private String uploadPath;
+
+    public UserSaleDto convertToDto(UserSale userSale) {
+        return new UserSaleDto(
+                userSale.getId(),
+                userSale.getUser().getId(),
+                userSale.getUser().getUsername(),
+                userSale.getMessage().getId(),
+                userSale.getMessage().getTitle(),
+                userSale.getCost()
+        );
+    }
+
+    public List<UserSaleDto> convertToDtoList(List<UserSale> userSales) {
+        return userSales.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    public ReviewDto convertToDto(Review review) {
+        return new ReviewDto(
+                review.getId(),
+                review.getReview_text(),
+                review.getAuthor_review().getUsername(),
+                review.getMessageReview().getId()
+        );
+    }
+
+    public MessageDto convertToDto(Message message) {
+        return new MessageDto(
+                message.getId(),
+                message.getText(),
+                message.getTitle(),
+                message.getFull_text(),
+                message.getTag(),
+                message.getCost(),
+                message.getAuthor().getUsername(),
+                message.getReviews().stream().map(Review::getReview_text).collect(Collectors.toList()),
+                message.getFilename()
+        );
+    }
+
+    public List<MessageDto> convertToMessageDtoList(List<Message> messages) {
+        return messages.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
 
 
     @Transactional
@@ -188,22 +234,19 @@ public class MainService {
         model.addAttribute("userId", currentUser.getId());
         model.addAttribute("messageId", message != null ? message.getId() : null);
 
-        // Логика добавления сообщения в список выбранных
+
         try {
             if (message != null && !currentUser.getSelectedMessages().contains(message)) {
                 currentUser.getSelectedMessages().add(message);
                 userRepo.save(currentUser);
             }
         } catch (Exception e) {
-            // Обработка ошибок (например, логирование)
         }
 
         return "redirect:/user-sale/" + user.getId() + (message != null ? "?message=" + message.getId() : "");
     }
 
-    /**
-     * Логика добавления отзыва.
-     */
+
     @Transactional
     public String addReview(User currentUser, Long userId, Message message, String reviewText, RedirectAttributes redirectAttributes) {
         if (message != null && !reviewText.isEmpty()) {
