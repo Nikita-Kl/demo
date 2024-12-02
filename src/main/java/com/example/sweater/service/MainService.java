@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class MainService {
+public class MainService implements MainServiceInterface {
     @Autowired
     private MessageRepo messageRepo;
     @Autowired
@@ -43,6 +43,7 @@ public class MainService {
     @Value("${upload.path}")
     private String uploadPath;
 
+    @Override
     public UserSaleDto convertToDto(UserSale userSale) {
         return new UserSaleDto(
                 userSale.getId(),
@@ -54,10 +55,12 @@ public class MainService {
         );
     }
 
+    @Override
     public List<UserSaleDto> convertToDtoList(List<UserSale> userSales) {
         return userSales.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
+    @Override
     public ReviewDto convertToDto(Review review) {
         return new ReviewDto(
                 review.getId(),
@@ -67,6 +70,7 @@ public class MainService {
         );
     }
 
+    @Override
     public MessageDto convertToDto(Message message) {
         return new MessageDto(
                 message.getId(),
@@ -81,12 +85,12 @@ public class MainService {
         );
     }
 
+    @Override
     public List<MessageDto> convertToMessageDtoList(List<Message> messages) {
         return messages.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-
-
+    @Override
     @Transactional
     public String getMainPage(String filter, Long compareUserId, User currentUser, Model model, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -120,7 +124,8 @@ public class MainService {
         return "main";
     }
 
-    private void findClosestUser(Model model, Long compareUserId, User selectedUser, Set<Message> selectedUserMessages) {
+    @Override
+    public void findClosestUser(Model model, Long compareUserId, User selectedUser, Set<Message> selectedUserMessages) {
         List<User> otherUsers = userRepo.findAllByIdNot(compareUserId);
         User closestUser = null;
         Set<Message> closestUserMessages = null;
@@ -167,7 +172,8 @@ public class MainService {
         }
     }
 
-    private void suggestRandomMessages(Model model, User currentUser) {
+    @Override
+    public void suggestRandomMessages(Model model, User currentUser) {
         if (currentUser != null) {
             List<Message> availableMessages = userRepo.findAll().stream()
                     .filter(user -> !user.getId().equals(currentUser.getId()))
@@ -186,12 +192,14 @@ public class MainService {
         }
     }
 
+    @Override
     public void saveMessage(User user, Message message, MultipartFile file) throws IOException {
         message.setAuthor(user);
         saveFile(message, file);
         messageRepo.save(message);
     }
 
+    @Override
     public void saveFile(Message message, MultipartFile file) throws IOException {
         if (file != null && !file.getOriginalFilename().isEmpty()) {
             File uploadDir = new File(uploadPath);
@@ -208,6 +216,7 @@ public class MainService {
         }
     }
 
+    @Override
     public void addUserSale(User currentUser, Long userId, Message message, Long cost) {
         if (message != null) {
             UserSale userSale = new UserSale();
@@ -217,6 +226,8 @@ public class MainService {
             userSaleRepo.save(userSale);
         }
     }
+
+    @Override
     @Transactional
     public String getUserSalePage(User currentUser, User user, Model model, Message message) {
         Set<Message> messages = user.getMessages();
@@ -246,7 +257,7 @@ public class MainService {
         return "redirect:/user-sale/" + user.getId() + (message != null ? "?message=" + message.getId() : "");
     }
 
-
+    @Override
     @Transactional
     public String addReview(User currentUser, Long userId, Message message, String reviewText, RedirectAttributes redirectAttributes) {
         if (message != null && !reviewText.isEmpty()) {
@@ -260,6 +271,7 @@ public class MainService {
         return "redirect:/user-sale/" + userId + "?message=" + (message != null ? message.getId() : "");
     }
 
+    @Override
     @Transactional
     public String getUserMessages(User currentUser, User user, Model model, Message message) {
         Set<Message> messages = user.getMessages();
@@ -272,9 +284,7 @@ public class MainService {
         return "userMessages";
     }
 
-    /**
-     * Обновление сообщения.
-     */
+    @Override
     @Transactional
     public String updateMessage(
             User currentUser, User user, Message message, String text, String tag, String title,
@@ -312,9 +322,7 @@ public class MainService {
         return "redirect:/user-messages/" + user.getId();
     }
 
-    /**
-     * Получение чека для продажи.
-     */
+    @Override
     @Transactional
     public String getReceipt(Long saleId, Model model) {
         UserSale userSale = userSaleRepo.findById(saleId)

@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @Service
-public class RegistrationService {
+public class RegistrationService implements RegistrationServiceInterface {
     private static final String CAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s";
 
     @Value("${recaptcha.secret}")
@@ -27,6 +27,7 @@ public class RegistrationService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Override
     @Transactional
     public String registerUser(User user, String passwordConfirm, String captchaResponse,
                                BindingResult bindingResult, Model model) {
@@ -60,6 +61,7 @@ public class RegistrationService {
         return "redirect:/login";
     }
 
+    @Override
     @Transactional
     public String activateUser(String code, Model model) {
         boolean isActivated = userService.activateUser(code);

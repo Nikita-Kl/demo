@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements UserServiceInterface {
     @Autowired
     private UserRepo userRepo;
 
@@ -27,10 +27,13 @@ public class UserService implements UserDetailsService {
     private  PasswordEncoder passwordEncoder;
     @Autowired
     private MailSender mailSender;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepo.findByUsername(username);
     }
+
+    @Override
     public UserDto getUserDto(Long id) {
         User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         return toDto(user);
@@ -47,6 +50,7 @@ public class UserService implements UserDetailsService {
                 user.getReviews().stream().map(Review::getId).collect(Collectors.toSet())
         );
     }
+    @Override
     public boolean addUser(User user) {
         User userFromDb = userRepo.findByUsername(user.getUsername());
 
@@ -72,6 +76,8 @@ public class UserService implements UserDetailsService {
             mailSender.send(user.getEmail(), "Activation code", message);
         }
     }
+
+    @Override
     public boolean activateUser(String code) {
         User user = userRepo.findByActivationCode(code);
         if(user == null){
@@ -82,10 +88,13 @@ public class UserService implements UserDetailsService {
         userRepo.save(user);
         return true;
     }
+
+    @Override
     public List<User> findAll() {
         return userRepo.findAll();
     }
 
+    @Override
     public void saveUser(User user, String username, Map<String, String> form) {
 
         user.setUsername(username);

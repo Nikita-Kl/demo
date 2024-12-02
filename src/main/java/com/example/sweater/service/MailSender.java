@@ -7,13 +7,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MailSender {
+public class MailSender implements MailSenderInterface {
     @Autowired
     private JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
     private String username;
 
+    @Override
     public void send(String emailTo, String subject, String message) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(username);
